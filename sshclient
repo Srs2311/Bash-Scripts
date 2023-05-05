@@ -1,0 +1,35 @@
+#!/bin/bash
+#creates a easier to use interface for ssh connections w/o the need for third party software
+
+#Function to start ssh connection. Collects username and collects ip address from database
+startSSH() {
+	echo "Input Username"
+	read username
+	ipaddr=$(column -s ':' -t --table-name SSH-Servers sshServers | tail -n +$selection | head -n 1 | grep -o '192.168.2.[0-9][0-9]\?[0-9]\?')
+	at='@'
+	sshlogin=$username$at$ipaddr
+	ssh $sshlogin
+}
+
+#prints database table with available connections
+echo Initiate Connection:
+column -s ':' -t --table-name SSH-Servers --table-columns ID,HOSTNAME,SERVICE,ADDRESS --table-hide ADDRESS sshServers
+
+#wrapper for collecting selections. Allows user to select from options on the table, and cycles until user picks a valid option. 
+#
+#Looking to change options to a for loop to skim database instead of manually programming option
+#another option is to program 1-9 as hard options and create a page system for the database
+
+repeat=true
+while [ repeat ];do
+	read selection
+	if [ "$selection" == '1' ];then
+		startSSH
+	elif [ "$selection" == '2' ];then
+		startSSH
+	elif [ "$selection" == 'q' ];then
+		exit 0
+	else
+		echo Enter a valid option
+	fi
+done
