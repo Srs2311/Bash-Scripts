@@ -5,10 +5,11 @@
 startSSH() {
 	echo "Input Username"
 	read username
-	ipaddr=$(column -s ':' -t --table-name SSH-Servers sshServers | tail -n +$selection | head -n 1 | grep -o '192.168.2.[0-9][0-9]\?[0-9]\?')
+	ipaddr=$(tail -n +$selection sshServers| head -n 1 | cut -d ":" -f 4)
+	port=$(tail -n $selection sshServers | head -n 1 | cut -d ":" -f 5)
 	at='@'
 	sshlogin=$username$at$ipaddr
-	ssh $sshlogin
+	ssh -p $port $sshlogin
 }
 
 #prints database table with available connections
@@ -23,13 +24,24 @@ column -s ':' -t --table-name SSH-Servers --table-columns ID,HOSTNAME,SERVICE,AD
 repeat=true
 while [ repeat ];do
 	read selection
-	if [ "$selection" == '1' ];then
-		startSSH
-	elif [ "$selection" == '2' ];then
-		startSSH
-	elif [ "$selection" == 'q' ];then
+	if [ "$selection" == 'q' ];then
 		exit 0
+	elif [ "$selection" -eq "$selection" ];then
+		startSSH
 	else
-		echo Enter a valid option
+		echo enter a valid selection
 	fi
 done
+#The old way of doing things - changing to for loop
+#while [ repeat ];do
+#	read selection
+#	if [ "$selection" == '1' ];then
+#		startSSH
+#	elif [ "$selection" == '2' ];then
+#		startSSH
+#	elif [ "$selection" == 'q' ];then
+#		exit 0
+#	else
+#		echo Enter a valid option
+#	fi
+#done
